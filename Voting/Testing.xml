@@ -1,0 +1,7 @@
+<Msg><Head><MsgID>21</MsgID><Description>Create VotingSoftware Component</Description></Head>
+<Body>
+	<Item><Key>Name</Key><Value>Testing</Value></Item>
+	<Item><Key>SourceCode</Key><Value>Testing.java</Value></Item>
+	<Item><Key>InputMsgID 1</Key><Value>701</Value></Item>
+	<Item><Key>OutputMsgID 1</Key><Value>711</Value></Item>
+</Body></Msg>
