@@ -8,15 +8,15 @@
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.TextArea;
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,18 +38,24 @@ import org.xml.sax.SAXException;
 public class Window extends JFrame implements ActionListener {
 
 	// create serverIP
-
+	   private String fullPath; 
 	  JFileChooser fc;
 	  final JLabel statusbar = 
-              new JLabel("File Path");
+              new JLabel("Waiting for file...");
 	private JTextArea area; 
 	private	JTextField serverIP = new JTextField(9); 
 	private JTextField portText = new JTextField(5);
 	private JButton submit;
-	   private JLabel statusLabel;
+	private JButton send; 
+	private JLabel statusLabel;
 	private JButton load;
 	final JFileChooser  fileDialog = new JFileChooser();
 	private JFrame frame; 
+	 BufferedReader in;
+	 BufferedReader stdIn;
+	 PrintWriter out;
+	 String filename; 
+	 Socket socket;
 	public static void main(String[] args)
 	{
 		new Window(); 
@@ -87,9 +93,13 @@ public class Window extends JFrame implements ActionListener {
 		
 		statusbar.setSize(350,100);
 
+		send = new JButton("Send");
+		send.addActionListener(this);
+		send.setEnabled(false);
+		send.setBounds(5,490, 70,20);
 		submit = new JButton("Connect");
 		submit.addActionListener(this);
-		 load = new JButton("Load");
+		load = new JButton("Load");
 		load.setEnabled(false);
 		load.addActionListener(this);
 		ip.setBounds(5,30, 150, 120);
@@ -98,10 +108,10 @@ public class Window extends JFrame implements ActionListener {
 		serverIP.setBounds(120,75,80,30);
 		portText.setBounds(305,75,55,30);
 		submit.setBounds(360,80,85,20); // windows = 76, 20
-		load.setBounds(250,120,70,20);
+		load.setBounds(360,120,70,20);
 		statusbar.setBounds(102,96,260,70);
 		
-		area.setBounds(10, 180, 200, 300);
+		area.setBounds(5, 180, 380, 300);
 		
 		// JLabelText 
 		serverIP.requestFocus();
@@ -129,6 +139,7 @@ public class Window extends JFrame implements ActionListener {
 		panel.add(loadXML);
 		panel.add(statusbar);
 		panel.add(area);
+		panel.add(send);
 		
 		panel.setBorder(BorderFactory.createLineBorder(Color.black));
 		panel.setBounds(1000, 1000, 1000, 1000);
@@ -149,7 +160,7 @@ public class Window extends JFrame implements ActionListener {
 	    //Handle open button action.
 	   if(e.getSource() == submit)
 	   {
-		   Socket socket;
+		   
 	    	
 	    	String serverString = serverIP.getText();	 
 			 String portString = portText.getText();	
@@ -162,70 +173,110 @@ public class Window extends JFrame implements ActionListener {
 					      
 					      try {
 					    		socket = new Socket(serverString, number);
-								 PrintWriter out =
+								  out =
 									        new PrintWriter(socket.getOutputStream(), true);
-									    BufferedReader in =
+									     in =
 									        new BufferedReader(
 									            new InputStreamReader(socket.getInputStream()));
-									    BufferedReader stdIn =
+									   stdIn =
 									        new BufferedReader(
 									            new InputStreamReader(System.in));
 								
 								// this is where the service is connected. 
 									      System.out.println("Connection Established");
 									      load.setEnabled(true);
+									      submit.setEnabled(false);
+									      send.setEnabled(true);
 									      
 					    	} catch(IOException ex) {
 					    	   ex.getMessage();
 					    	} 
 					      
 					      
-			 
+			
 		   
 		   
+	   }
+	   else if(e.getSource() == send)
+	   {
+		   //sending over test. -> no need for encoder....yet.
+		   //System.out.println("In Send");
+		   //send the file over. 
+		   PrintWriter pw;
+		 //  MsgEncoder mEncode = new MsgEncoder();
+		 // KeyValueList valid = new KeyValueList();
+		try {
+			//valid.addPair("File", fullPath);
+			//valid.addPair("Keys", values);
+			pw = new PrintWriter(socket.getOutputStream(), true);
+			 pw.println(filename);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		     
+
 	   }
 	   
 	   // load the xml. 
 	   else if(e.getSource() == load)
 	   {
+	
 		
 		   //Handle open button action.
 		    if (e.getSource() == load) {
-		    	  JFileChooser chooser = new JFileChooser();
-		          int option = chooser.showOpenDialog(Window.this);
-		          if (option == JFileChooser.APPROVE_OPTION) {
-		        	  File file = chooser.getSelectedFile();
-		           
-		                // What to do with the file, e.g. display it in a TextArea
-		               String text =  file.getAbsolutePath();
-		               System.out.println(text);
-		             
-		               Parse p = new Parse(file, text); 
-		               
-		               
-		               
-		               
-		               try {
-						p.parseFile();
-					} catch (ParserConfigurationException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (SAXException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} 
-		               
-		               
-		               
-		          }
-		          
-		          // perform operation
-		          
+		    	FileDialog fd = new FileDialog(frame, "Choose a file", FileDialog.LOAD);
+		    	fd.setDirectory("C:\\");
+		    	fd.setFile("*.xml");
+		    	fd.setVisible(true);
+		    	filename = fd.getFile();
+		    	String absPath = fd.getDirectory();
+		    	fullPath = absPath+filename; 
+		    	statusbar.setText(fullPath);
+		    	if (filename == null)
+		    	  System.out.println("You cancelled the choice");
+		    	else
+		    	{
+		    	
+					    Parse p = new Parse(fullPath);
+					    try {
+							p.parseFile();
+						} catch (ParserConfigurationException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (SAXException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					    
+					    // make the key and the xml list display on the text area. 
+					   ArrayList keys = p.getKey();
+					   ArrayList values = p.getValues();
+					   
+					   String display = "";
+					  
+					   for(int j = 0; j<keys.size(); j++)
+					   {
+						   for(int k = 0; k<values.size(); k++)
+						   {
+							   display = "Key: " + keys.get(j) + "\n" + "Value : " + values.get(k);
+						   }
+					   }
+					   
+					   area.setText(display);
+					   
+		    		
+		    		
+		    		
+		    		// used for testing
+		    	  //System.out.println("You chose " + filename);
+		    	  //System.out.println("You chose " + absPath);
 		        }
-		
+	
+		    }
 		    
 	   }
 	   

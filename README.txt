@@ -14,3 +14,8 @@ Overview:
         This will also send data back to the prjRemote. 
              
             
+-Corey: Milestone 3 (04/09/2014)
+        Needs added: Needs to use MsgEncoder and then handle test file.
+        Once figure out way to use server to send xml as MsgeEncoder then
+        GUI(Milestone3) will be completed.
+	

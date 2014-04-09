@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,12 +14,14 @@ import org.xml.sax.SAXException;
 
 
 public class Parse {
-	private File f; 
+   
 	String filePath; 
-	
-	public Parse(File f, String filePath)
+	ArrayList valueList; 
+	ArrayList keyList;
+	ArrayList itemsList; 
+	public Parse (String filePath)
 	{
-		this.f = f; 
+		
 		this.filePath = filePath; 
 		
 	}
@@ -27,6 +30,7 @@ public class Parse {
 	
 	public void parseFile() throws ParserConfigurationException, SAXException, IOException
 	{
+		
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.parse (new File(filePath));
@@ -39,7 +43,10 @@ public class Parse {
         NodeList noItems= doc.getElementsByTagName("Item");
         int items = noItems.getLength();
         System.out.println("Total no of Items : " + items);
-
+        valueList = new ArrayList(); // contains list of xml values.
+        keyList = new ArrayList(); // contains list of keys 
+        itemsList = new ArrayList(); 
+        
         for(int i = 0; i<noItems.getLength(); i++)
         {
         	Node firstPersonNode = noItems.item(i);
@@ -54,6 +61,7 @@ public class Parse {
                 System.out.println("Key Name: " + 
                        ((Node)textFNList.item(0)).getNodeValue().trim());
                 
+                keyList.add(((Node)textFNList.item(0)).getNodeValue().trim());
                 //-------
                 NodeList lastNameList = firstPersonElement.getElementsByTagName("Value");
                 Element lastNameElement = (Element)lastNameList.item(0);
@@ -61,10 +69,23 @@ public class Parse {
                 NodeList textLNList = lastNameElement.getChildNodes();
                 System.out.println("Value : " + 
                        ((Node)textLNList.item(0)).getNodeValue().trim());
+                valueList.add(((Node)textLNList.item(0)).getNodeValue().trim());
                 
             }//end if 
         } // end for loop 
-
+        System.out.println(valueList.get(1));
         
 	} 
+	
+	
+	
+	public ArrayList getValues()
+	{
+		return valueList;
+	}
+	
+	public ArrayList getKey()
+	{
+		return keyList;
+	}
 }
