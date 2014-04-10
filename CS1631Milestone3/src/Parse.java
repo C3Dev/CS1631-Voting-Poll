@@ -19,6 +19,7 @@ public class Parse {
 	ArrayList valueList; 
 	ArrayList keyList;
 	ArrayList itemsList; 
+	ArrayList desc; 
 	public Parse (String filePath)
 	{
 		
@@ -46,6 +47,16 @@ public class Parse {
         valueList = new ArrayList(); // contains list of xml values.
         keyList = new ArrayList(); // contains list of keys 
         itemsList = new ArrayList(); 
+        desc = new ArrayList(); 
+        
+        NodeList descList = doc.getElementsByTagName("Description");
+        Element element1 = (Element)descList.item(0);	
+        NodeList fstNm = element1.getChildNodes();
+        //System.out.print("Name : " + (fstNm.item(0)).getNodeValue());
+        
+       desc.add( (fstNm.item(0)).getNodeValue());
+        
+
         
         for(int i = 0; i<noItems.getLength(); i++)
         {
@@ -54,6 +65,8 @@ public class Parse {
 
                 Element firstPersonElement = (Element)firstPersonNode;
 
+               
+                
                 //-------
                 NodeList firstNameList = firstPersonElement.getElementsByTagName("Key");
                 Element firstNameElement = (Element)firstNameList.item(0);
@@ -87,5 +100,10 @@ public class Parse {
 	public ArrayList getKey()
 	{
 		return keyList;
+	}
+	
+	public ArrayList getDesc()
+	{
+		return desc; 
 	}
 }

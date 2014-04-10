@@ -322,8 +322,12 @@ public class Testing
 		ArrayList keyList;
 		ArrayList itemsList; 
 		/*
+		
 		Checks for command line argument
 	*/
+	
+	TallyTable tTable = null;
+	BufferedReader fromServer = null;
 	
 	/* 
 	if (args.length < 1)
@@ -338,12 +342,21 @@ public class Testing
 	MsgEncoder mEncoder = new MsgEncoder();
 	final MsgDecoder mDecoder = new MsgDecoder(client.getInputStream());
 
-	TallyTable tTable = null;
-	BufferedReader fromServer = null;
+	
+	PrintWriter toServer = null;
+	int count = 0; 
+	while(count < 8){
+	
 	fromServer = new BufferedReader(
         	new InputStreamReader(client.getInputStream()));
+        	
+	
+	toServer = new PrintWriter(client.getOutputStream(), true);
+	
 	String fileName = fromServer.readLine(); 
-	System.out.println(fileName); 
+	String shortName = fromServer.readLine(); 
+	System.out.println("THE SHORTNAME = " +shortName);
+		System.out.println("CLIENT RECEIVED!!!!!" + fileName); 
 	/*
 		Fetches for new messages sent from InputProcessor to the SISServer
 	*///	System.out.println("Loading xml....");
@@ -355,10 +368,6 @@ public class Testing
 	
 	
 	// do the client parsing. 
-	
-	
-	
-	
 	
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -410,41 +419,107 @@ public class Testing
                // list.add(((Node)textLNList.item(0)).getNodeValue().trim());
             }//end if 
         } // end for loop 
-        System.out.println(valueList.get(1));
+       
+       
 	
 	
 	
+	// heres for the testing condition: 
+	if(shortName.equals("704.xml"))
+	{		
+		
+			
+			String finalText = ""; 
+			System.out.println("MSG 704"); 
+			String fileIDS = valueList.get(1).toString(); 
+			String fileIDArray[] = fileIDS.split(";"); 
+			System.out.println(fileIDArray[0]); 
+			System.out.println("GOOD VAL " + fileIDArray[1]); 
+			// This has to handle all of the test files. 
+
+			String text; 
+			for(int i = 0; i<fileIDArray.length; i++)
+			{
+			
+			text = fileIDArray[i];
+			System.out.println(text);
+			// do the client parsing. 
+		
+			text = text + ".xml"; 
+			System.out.println("The TEXT IS::::" +text);
+		DocumentBuilderFactory docBuilderFactory1 = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder1 = docBuilderFactory1.newDocumentBuilder();
+        Document doc1 = docBuilder1.parse (new File(text));
+
+        // normalize text representation
+        doc1.getDocumentElement ().normalize ();
+        System.out.println ("Root element of the doc is " + 
+             doc1.getDocumentElement().getNodeName());
+      
+
+		    //  NodeList idNO  = doc.getElementsByTagName("MsgID");
+             //   Element idNOElement = (Element)idNO.item(0);
+              //  NodeList idNOList = idNOElement.getChildNodes();
+               // System.out.println("MSGID: " + 
+                //       ((Node)idNOList.item(0)).getNodeValue().trim());
+		//int msgID = (idNOList.item(0)).getNodeValue().trim(); 
+		
+        NodeList noItems1= doc.getElementsByTagName("Item");
+        int items1 = noItems1.getLength();
+        System.out.println("Total no of Items : " + items1);
+       ArrayList valueList1 = new ArrayList(); // contains list of xml values.
+       ArrayList keyList1 = new ArrayList(); // contains list of keys 
+       ArrayList itemsList1 = new ArrayList(); 
+        
+        for(int j = 0; j<noItems1.getLength(); j++)
+        {
+        	Node firstPersonNode1 = noItems1.item(j);
+            if(firstPersonNode1.getNodeType() == Node.ELEMENT_NODE){
+
+                Element firstPersonElement1 = (Element)firstPersonNode1;
+
+                //-------
+                NodeList firstNameList1 = firstPersonElement1.getElementsByTagName("Key");
+                Element firstNameElement1 = (Element)firstNameList1.item(0);
+                NodeList textFNList1 = firstNameElement1.getChildNodes();
+                System.out.println("Key Name: " + 
+                       ((Node)textFNList1.item(0)).getNodeValue().trim());
+                //list.add(((Node)textFNList.item(0)).getNodeValue().trim());
+                keyList1.add(((Node)textFNList1.item(0)).getNodeValue().trim());
+                //-------
+                NodeList lastNameList1 = firstPersonElement1.getElementsByTagName("Value");
+                Element lastNameElement1 = (Element)lastNameList1.item(0);
 	
-	
-	
-	
-	
-		switch(fileName)
+                NodeList textLNList1 = lastNameElement1.getChildNodes();
+                System.out.println("Value : " + 
+                       ((Node)textLNList1.item(0)).getNodeValue().trim());
+                valueList1.add(((Node)textLNList1.item(0)).getNodeValue().trim());
+               // list.add(((Node)textLNList.item(0)).getNodeValue().trim());
+            }//end if 
+        } // end for loop 
+       
+			
+
+		switch(text)
 		{
 
 			/*
 				Casts Vote 
 			*/	
 			
-			case "704.xml":
-			{
-			System.out.println("MSG 704"); 
-			
-			// This has to handle all of the test files. 
-			
-						
-			
-			
-			
-			}
 			case "701.xml": 
+			case "701a.xml":
+			case "701b.xml":
+			case "701c.xml":
 			{
-			/*
+					Thread.sleep(5000); 
 				System.out.println("The message is 701");
 				if (tTable != null) 
 				{
-					String phone = list.getValue("VoterPhoneNo");
-					String candidate = list.getValue("CandidateID");
+				
+					
+					String phone = valueList1.get(0).toString(); // gets the phone # 
+					String candidate = valueList1.get(1).toString();;
 
 					int status = tTable.castVote(phone, candidate);
 
@@ -453,9 +528,11 @@ public class Testing
 					valid.addPair("Description", "Acknowledge Vote (1 - duplicate, 2 - invalid, 3 - valid");
 					valid.addPair("Status", status + "" );
 					valid.addPair("VoterEmail", phone + "");
-					mEncoder.sendMsg(valid, client.getOutputStream());
-*/
-				//}
+				//	mEncoder.sendMsg(valid, client.getOutputStream());
+					toServer.println(valid.toString()); 
+				//finalText = finalText + "Running..." + text + "\n"; 
+			
+				}
 			}
 			break;
 			/*
@@ -463,42 +540,58 @@ public class Testing
 			*/
 			
 			case "21.xml": 
-			{
-				System.out.println("The Voting Software component has been created!");
-				break;
-			}
+			
+					Thread.sleep(7000); 
+			//	System.out.println("Worked"); 
+				String retVal1 = "The Voting Software component has been created!"; 
+				//System.out.println("The Voting Software component has been created!");
+				toServer.println(retVal1); 
+				// send back! 
+				//finalText = finalText + "Running..." + text + "\n"; 
+			
+			break; 
 			
 			case "702.xml": 
-			{System.out.println("The message is 702");
-			/*
-		
-					int winnersNum = Integer.parseInt(values.getValue("N"));
+			
+			{
+				Thread.sleep(5000); 
+			System.out.println("The message is 702");
+			
+					int winnersNum = Integer.parseInt(valueList1.get(1).toString()); 
+					
 					String rankedReport = tTable.getWinner(winnersNum);
 
 					KeyValueList valid = new KeyValueList();
 					valid.addPair("MsgID", "712");
 					valid.addPair("Description", "Acknowledge RequestReport");
 					valid.addPair("RankedReport", rankedReport);
-					valid.addPair("AdminEmail", list.getValue("RequestId"));
+					//valid.addPair("AdminEmail", valueList.get(1).toString());
 					//mEncoder.sendMsg(valid, client.getOutputStream());
-					System.out.println("Send back to server time!");
-					*/ 
+					//System.out.println("Send back to server time!");
+					toServer.println(valid.toString());
+					//finalText = finalText + "Running..." + text + "\n"; 
+			
 						}
 			break;
 			/*
 				Initallizes TallyTable
 			*/
 			case "703.xml": 
-			{System.out.println("The message is 703");
+			{
+				Thread.sleep(5000); 
+			System.out.println("The message is 703");
 				
-				/*
-				//needs to open and save into a list. 
 				
-				if (list.getValue("Passcode").equals(passcode)) 
-				{
-					String CandidateList = list.getValue("CandidateList");
-					String CandidateIDs[] = CandidateList.split("[;]");
+				
+					String CandidateList = keyList1.get(1).toString(); 
+					String ids = valueList1.get(1).toString(); 
+					String CandidateIDs[] = ids.split(";"); 
+					//System.out.println(CandidateIDs[0]);
+					//System.out.println(CandidateIDs[1]);
+					
+					
 					List<String> CandidateID = Arrays.asList(CandidateIDs);
+
 
 					tTable = new TallyTable(CandidateID);
 
@@ -508,15 +601,136 @@ public class Testing
 					valid.addPair("AckMsgID", "703");
 					valid.addPair("YesNo", "Yes");
 					valid.addPair("Name", "TallyTable");
-					mEncoder.sendMsg(valid, client.getOutputStream());
-
-				}
-				*/
+					//System.out.println("Sending over to server: " + valid.toString()); 
+					toServer.println(valid.toString()); 
+				//	finalText = finalText + "Running..." + text + "\n"; 
+			
 			}
 			break;	
 			default: break;
 		}		    
 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		//	toServer.println(valid.toString()); 
+			
+			}
+
+
+
+
+	}
+	//------------------
+	else{
+		switch(shortName)
+		{
+
+			/*
+				Casts Vote 
+			*/	
+			
+			case "701.xml": 
+			case "701a.xml":
+			case "701b.xml":
+			case "701c.xml":
+			{
+			
+				System.out.println("The message is 701");
+				if (tTable != null) 
+				{
+				
+					
+					String phone = valueList.get(0).toString(); // gets the phone # 
+					String candidate = valueList.get(1).toString();;
+
+					int status = tTable.castVote(phone, candidate);
+
+					KeyValueList valid = new KeyValueList();
+					valid.addPair("MsgID", "711");
+					valid.addPair("Description", "Acknowledge Vote (1 - duplicate, 2 - invalid, 3 - valid");
+					valid.addPair("Status", status + "" );
+					valid.addPair("VoterEmail", phone + "");
+				//	mEncoder.sendMsg(valid, client.getOutputStream());
+					toServer.println(valid.toString()); 
+				}
+			}
+			break;
+			/*
+				Returns TallyTable request
+			*/
+			
+			case "21.xml": 
+			
+			
+			//	System.out.println("Worked"); 
+				String retVal = "The Voting Software component has been created!"; 
+				//System.out.println("The Voting Software component has been created!");
+				toServer.println(retVal); 
+				// send back! 
+			
+			break; 
+			
+			case "702.xml": 
+			{System.out.println("The message is 702");
+			
+					int winnersNum = Integer.parseInt(valueList.get(1).toString()); 
+					
+					String rankedReport = tTable.getWinner(winnersNum);
+
+					KeyValueList valid = new KeyValueList();
+					valid.addPair("MsgID", "712");
+					valid.addPair("Description", "Acknowledge RequestReport");
+					valid.addPair("RankedReport", rankedReport);
+					//valid.addPair("AdminEmail", valueList.get(1).toString());
+					//mEncoder.sendMsg(valid, client.getOutputStream());
+					System.out.println("Send back to server time!");
+					toServer.println(valid.toString());
+						}
+			break;
+			/*
+				Initallizes TallyTable
+			*/
+			case "703.xml": 
+			{System.out.println("The message is 703");
+				
+				
+				
+					String CandidateList = keyList.get(1).toString(); 
+					String ids = valueList.get(1).toString(); 
+					String CandidateIDs[] = ids.split(";"); 
+					//System.out.println(CandidateIDs[0]);
+					//System.out.println(CandidateIDs[1]);
+					
+					
+					List<String> CandidateID = Arrays.asList(CandidateIDs);
+
+
+					tTable = new TallyTable(CandidateID);
+
+					KeyValueList valid = new KeyValueList();
+					valid.addPair("MsgID", "26");
+					valid.addPair("Description", "Acknowledgement (Server acknowledges that GUI component is now connected to Server)");
+					valid.addPair("AckMsgID", "703");
+					valid.addPair("YesNo", "Yes");
+					valid.addPair("Name", "TallyTable");
+					//System.out.println("Sending over to server: " + valid.toString()); 
+					toServer.println(valid.toString()); 
+			}
+			break;	
+			default: break;
+		}		    
+
+	System.out.println("About to thread"); 
 		Thread t = new Thread( new Runnable()
 			{
 				public void run()
@@ -538,45 +752,15 @@ public class Testing
 			});
 		t.setDaemon( true );
 		t.start();
-		//System.out.println( "Load XML \n" );
-		try { System.in.read(); } catch( Throwable thr ) {};
-	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		System.out.println( "Hit Enter to continue after loading xml" );
+		try { System.in.read(); count++;} catch( Throwable thr ) {};
 	
 	
 	}
+	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}
 	
 	
 	

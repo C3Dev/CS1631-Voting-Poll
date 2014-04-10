@@ -19,3 +19,8 @@ Overview:
         Once figure out way to use server to send xml as MsgeEncoder then
         GUI(Milestone3) will be completed.
 	
+-Corey: Milestone 3 (4/10/2014)
+	Finished entire project, however project has bug with test .xml file 704.xml 
+        This needs to be worked out, contents not displaying on GUI frame. 
+        Note this code is ugly, needs refactored for production. Personal garbage 	
+	collecting needs address, along with reuse of code. This is a push for fast code.

@@ -43,6 +43,8 @@ public class Window extends JFrame implements ActionListener {
 	  final JLabel statusbar = 
               new JLabel("Waiting for file...");
 	private JTextArea area; 
+	private JTextArea rightSide; 
+	
 	private	JTextField serverIP = new JTextField(9); 
 	private JTextField portText = new JTextField(5);
 	private JButton submit;
@@ -56,15 +58,17 @@ public class Window extends JFrame implements ActionListener {
 	 PrintWriter out;
 	 String filename; 
 	 Socket socket;
+	 String value; 
 	public static void main(String[] args)
 	{
 		new Window(); 
+		
 	}
 	
 	public Window() 
 	{	// this needs to change. 
 		 String content = "";
-		
+		 String content2 = "";
 		// remove if not used on mac 
     	try { UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); } 
     	catch(Exception ex) { System.out.println("Error setting Java LAF: " + ex); }
@@ -74,7 +78,7 @@ public class Window extends JFrame implements ActionListener {
 		JPanel panel;
 		setLayout(null); 
 		area = new JTextArea(content); 
-		
+		rightSide = new JTextArea(content2);
 		
 		frame = new JFrame(); 
 		
@@ -111,8 +115,8 @@ public class Window extends JFrame implements ActionListener {
 		load.setBounds(360,120,70,20);
 		statusbar.setBounds(102,96,260,70);
 		
-		area.setBounds(5, 180, 380, 300);
-		
+		area.setBounds(5, 180, 300, 300);
+		rightSide.setBounds(320,180,300,300);
 		// JLabelText 
 		serverIP.requestFocus();
 		serverIP.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -140,7 +144,7 @@ public class Window extends JFrame implements ActionListener {
 		panel.add(statusbar);
 		panel.add(area);
 		panel.add(send);
-		
+		panel.add(rightSide);
 		panel.setBorder(BorderFactory.createLineBorder(Color.black));
 		panel.setBounds(1000, 1000, 1000, 1000);
 		// add the panel to the to the window. 
@@ -150,8 +154,8 @@ public class Window extends JFrame implements ActionListener {
 	
 		// make sure the frame is visible 
 		frame.setVisible(true);
+		
 	}
-	
 	
 		
 		
@@ -191,26 +195,92 @@ public class Window extends JFrame implements ActionListener {
 					    	} catch(IOException ex) {
 					    	   ex.getMessage();
 					    	} 
-					      
-					      
-			
+					     
 		   
 		   
 	   }
-	   else if(e.getSource() == send)
+	   else if(e.getSource() == send) // sends data to the client 
 	   {
-		   //sending over test. -> no need for encoder....yet.
+		   //sending over valuet. -> no need for encoder....yet.
 		   //System.out.println("In Send");
 		   //send the file over. 
-		   PrintWriter pw;
+	
 		 //  MsgEncoder mEncode = new MsgEncoder();
 		 // KeyValueList valid = new KeyValueList();
 		try {
-			//valid.addPair("File", fullPath);
-			//valid.addPair("Keys", values);
-			pw = new PrintWriter(socket.getOutputStream(), true);
-			 pw.println(filename);
-		} catch (IOException e1) {
+			
+			
+			
+			
+			System.out.println("THIS IS A BIG valueT FULLPATH" + fullPath);
+			System.out.println("THIS IS A BIG valueT FULLPATH" + filename);
+			out =
+			        new PrintWriter(socket.getOutputStream(), true);
+			 out.println(fullPath);
+			 out.println(filename);
+			 
+			 System.out.println("After Sending the data to the client");
+			 
+			// out.flush(); 
+			switch(filename){
+			case "21.xml":
+					System.out.println("In 21");
+					value = in.readLine();
+					System.out.println("The Value RETURNED IS " + value);
+				//	rightSide.setText("");
+					rightSide.setText(value);
+					break;
+				
+			case "703.xml":
+			    value = in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				System.out.println("The case value is " + value); 
+			//	rightSide.setText("");
+				rightSide.setText(value);
+				break;
+			case "704.xml":
+				Thread.sleep(7000);
+				
+				// data in from 
+			    value = in.readLine() + "\n";
+			   
+				System.out.println("The RETURNED VAlUE =) " + value); 
+				//rightSide.setText("");
+				rightSide.setText(value);
+			
+			case "701.xml":
+			case "701a.xml":
+			case "701b.xml":
+			case "701c.xml":
+				value = in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				System.out.println("The case value is " + value); 
+			//	rightSide.setText("");
+				rightSide.setText(value);
+				break;
+				
+				
+				
+			case "702.xml":
+				String value = in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				value = value + in.readLine() + "\n";
+				System.out.println("The case value is " + value); 
+			//	rightSide.setText("");
+				rightSide.setText(value);
+				break;
+			}
+			 
+			 
+		} catch (IOException | InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -222,6 +292,9 @@ public class Window extends JFrame implements ActionListener {
 	   else if(e.getSource() == load)
 	   {
 	
+		   
+		   
+		 
 		
 		   //Handle open button action.
 		    if (e.getSource() == load) {
@@ -255,7 +328,8 @@ public class Window extends JFrame implements ActionListener {
 					    // make the key and the xml list display on the text area. 
 					   ArrayList keys = p.getKey();
 					   ArrayList values = p.getValues();
-					   
+					   ArrayList desc = p.getDesc();
+				
 					   String display = "";
 					  
 					   for(int j = 0; j<keys.size(); j++)
@@ -263,6 +337,8 @@ public class Window extends JFrame implements ActionListener {
 						   for(int k = 0; k<values.size(); k++)
 						   {
 							   display = "Key: " + keys.get(j) + "\n" + "Value : " + values.get(k);
+							   display = display + "\n" + "Description: " + desc.get(0);
+							   
 						   }
 					   }
 					   
@@ -271,7 +347,7 @@ public class Window extends JFrame implements ActionListener {
 		    		
 		    		
 		    		
-		    		// used for testing
+		    		// used for valueting
 		    	  //System.out.println("You chose " + filename);
 		    	  //System.out.println("You chose " + absPath);
 		        }
