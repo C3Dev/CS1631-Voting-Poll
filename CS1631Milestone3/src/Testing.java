@@ -314,7 +314,7 @@ public class Testing
 
 	public static void main(String[] args) throws Exception
 	{
-		
+		String retVal1;
 		final ServerSocket server = new ServerSocket(port);
 	    Socket client = server.accept();
 	    String filePath; 
@@ -343,10 +343,10 @@ public class Testing
 	final MsgDecoder mDecoder = new MsgDecoder(client.getInputStream());
 
 	
-	PrintWriter toServer = null;
+	
 	int count = 0; 
 	while(count < 8){
-	
+	PrintWriter toServer = null;
 	fromServer = new BufferedReader(
         	new InputStreamReader(client.getInputStream()));
         	
@@ -543,8 +543,10 @@ public class Testing
 			
 					Thread.sleep(7000); 
 			//	System.out.println("Worked"); 
-				String retVal1 = "The Voting Software component has been created!"; 
+				 retVal1 = "The Voting Software component has been created!"; 
 				//System.out.println("The Voting Software component has been created!");
+				
+				
 				toServer.println(retVal1); 
 				// send back! 
 				//finalText = finalText + "Running..." + text + "\n"; 

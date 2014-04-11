@@ -9,9 +9,12 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -49,6 +52,7 @@ public class Window extends JFrame implements ActionListener {
 	private JTextField portText = new JTextField(5);
 	private JButton submit;
 	private JButton send; 
+	private JButton save;
 	private JLabel statusLabel;
 	private JButton load;
 	final JFileChooser  fileDialog = new JFileChooser();
@@ -96,11 +100,13 @@ public class Window extends JFrame implements ActionListener {
 		JLabel loadXML = new JLabel("Send Message:");
 		
 		statusbar.setSize(350,100);
-
+		save = new JButton("Save");
 		send = new JButton("Send");
 		send.addActionListener(this);
+		save.addActionListener(this);
 		send.setEnabled(false);
 		send.setBounds(5,490, 70,20);
+		save.setBounds(80,490, 70,20);
 		submit = new JButton("Connect");
 		submit.addActionListener(this);
 		load = new JButton("Load");
@@ -133,7 +139,7 @@ public class Window extends JFrame implements ActionListener {
 		portText.setText("7999");
 		
 		// add to the Panel
-		
+		panel.add(save);
 		panel.add(ip);
 		panel.add(serverIP);
 		panel.add(port); 
@@ -199,6 +205,24 @@ public class Window extends JFrame implements ActionListener {
 		   
 		   
 	   }
+	   else if(e.getSource() == save)
+	   {// save the file. 
+		  
+		   /*
+		   File file = new File(fullPath);
+		   FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
+	        fileDialog.setFilenameFilter(new FilenameFilter() {
+	            public boolean accept(File dir, String name) {
+	                return name.endsWith(".txt");
+	            }
+	        });
+	        fileDialog.setFile(file.toString());
+	        fileDialog.setVisible(true);
+	        System.out.println("File: " + fileDialog.getFile());
+	    
+	    */ 
+	   }
+	   
 	   else if(e.getSource() == send) // sends data to the client 
 	   {
 		   //sending over valuet. -> no need for encoder....yet.
@@ -209,26 +233,22 @@ public class Window extends JFrame implements ActionListener {
 		 // KeyValueList valid = new KeyValueList();
 		try {
 			
-			
-			
-			
-			System.out.println("THIS IS A BIG valueT FULLPATH" + fullPath);
-			System.out.println("THIS IS A BIG valueT FULLPATH" + filename);
-			out =
+		     out =
 			        new PrintWriter(socket.getOutputStream(), true);
 			 out.println(fullPath);
 			 out.println(filename);
 			 
-			 System.out.println("After Sending the data to the client");
+		//	 System.out.println("After Sending the data to the client");
 			 
 			// out.flush(); 
 			switch(filename){
 			case "21.xml":
-					System.out.println("In 21");
+					//System.out.println("In 21");
 					value = in.readLine();
-					System.out.println("The Value RETURNED IS " + value);
+				//	System.out.println("The Value RETURNED IS " + value);
 				//	rightSide.setText("");
 					rightSide.setText(value);
+					
 					break;
 				
 			case "703.xml":
@@ -237,19 +257,22 @@ public class Window extends JFrame implements ActionListener {
 				value = value + in.readLine() + "\n";
 				value = value + in.readLine() + "\n";
 				value = value + in.readLine() + "\n";
-				System.out.println("The case value is " + value); 
+			//	System.out.println("The case value is " + value); 
 			//	rightSide.setText("");
 				rightSide.setText(value);
 				break;
 			case "704.xml":
-				Thread.sleep(7000);
+			{
 				
 				// data in from 
 			    value = in.readLine() + "\n";
 			   
-				System.out.println("The RETURNED VAlUE =) " + value); 
+			//	System.out.println("The RETURNED VAlUE  " + value); 
 				//rightSide.setText("");
+		//		System.out.println("THE TEXT ES " + rightSide.getText());
 				rightSide.setText(value);
+				
+			}
 			
 			case "701.xml":
 			case "701a.xml":
@@ -260,7 +283,7 @@ public class Window extends JFrame implements ActionListener {
 				value = value + in.readLine() + "\n";
 				value = value + in.readLine() + "\n";
 				value = value + in.readLine() + "\n";
-				System.out.println("The case value is " + value); 
+			//	System.out.println("The case value is " + value); 
 			//	rightSide.setText("");
 				rightSide.setText(value);
 				break;
@@ -273,14 +296,14 @@ public class Window extends JFrame implements ActionListener {
 				value = value + in.readLine() + "\n";
 				value = value + in.readLine() + "\n";
 				value = value + in.readLine() + "\n";
-				System.out.println("The case value is " + value); 
+			//	System.out.println("The case value is " + value); 
 			//	rightSide.setText("");
 				rightSide.setText(value);
 				break;
 			}
 			 
 			 
-		} catch (IOException | InterruptedException e1) {
+		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
